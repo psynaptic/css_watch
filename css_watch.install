@@ -1,0 +1,14 @@
+<?php
+/**
+ * @file
+ * Install/uninstall hooks for CSS Watch module.
+ */
+
+/**
+ * Implements hook_uninstall().
+ */
+function css_watch_uninstall() {
+  variable_del('css_watch_poll_interval');
+  variable_del('css_watch_enabled_themes');
+  variable_del('css_watch_stylesheets');
+}

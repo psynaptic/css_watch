@@ -1,0 +1,4 @@
+name = CSS Watch
+description = Updates CSS files using JS when they are modified on the server.
+package = Development
+core = 7.x

@@ -1,0 +1,63 @@
+<?php
+/**
+ * @file
+ * CSS Watch updates CSS files using JS when they are modified on the server.
+ */
+
+define('CSS_WATCH_DEFAULT_INTERVAL', 3000);
+
+/**
+ * Implements hook_menu().
+ */
+function css_watch_menu() {
+  $items = array();
+
+  $items['admin/config/development/css-watch'] = array(
+    'title' => 'CSS Watch',
+    'description' => 'Administer CSS Watch Settings',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('css_watch_settings'),
+    'access arguments' => array('administer site configuration'),
+    'file' => 'css_watch.admin.inc',
+  );
+
+  return $items;
+}
+
+/**
+ * Implements hook_help().
+ */
+function css_watch_help($section) {
+  switch ($section) {
+    case 'admin/settings#css-watch':
+      return '<p>' . t('Administer CSS Watch settings.') . '</p>';
+  }
+}
+
+/**
+ * Implements hook_css_alter().
+ */
+function css_watch_css_alter(&$css) {
+  global $base_url;
+
+  $selected_stylesheets = variable_get('css_watch_stylesheets', array());
+
+  $stylesheets = array();
+  foreach ($selected_stylesheets as $path) {
+    if (file_exists($path)) {
+      $stylesheets[] = $path;
+      $css[$path]['preprocess'] = FALSE;
+    }
+  };
+
+  $jquery_settings = array(
+    'cssWatch' => array(
+      'paths' => $stylesheets,
+      'pollInterval' => variable_get('css_watch_poll_interval', CSS_WATCH_DEFAULT_INTERVAL),
+      'domain' => $base_url . '/',
+    )
+  );
+
+  drupal_add_js($jquery_settings, 'setting');
+  drupal_add_js(drupal_get_path('module', 'css_watch') . '/js/css_watch.js');
+}
